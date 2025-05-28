@@ -365,7 +365,6 @@ version = "0.1.0"
 dependencies = [
  "bytes",
  "proptest",
- "prost-build",
  "thiserror",
 ]
 

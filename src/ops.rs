@@ -118,15 +118,17 @@ impl Merge for ImprintRecord {
             let current_entry;
             let current_payload;
             let mut duplicate_payload = None;
-            if self_idx < self.directory.len() &&
-                (other_idx >= other.directory.len() ||
-                    self.directory[self_idx].id <= other.directory[other_idx].id)
+            if self_idx < self.directory.len()
+                && (other_idx >= other.directory.len()
+                    || self.directory[self_idx].id <= other.directory[other_idx].id)
             {
                 current_entry = &self.directory[self_idx];
-                if other_idx < other.directory.len() &&
-                    self.directory[self_idx].id == other.directory[other_idx].id {
+                if other_idx < other.directory.len()
+                    && self.directory[self_idx].id == other.directory[other_idx].id
+                {
                     if !options.filter_duplicate_payloads {
-                        duplicate_payload = Some(other.get_raw_bytes(other.directory[other_idx].id).unwrap());
+                        duplicate_payload =
+                            Some(other.get_raw_bytes(other.directory[other_idx].id).unwrap());
                     }
                     other_idx += 1;
                 }
@@ -153,8 +155,8 @@ impl Merge for ImprintRecord {
                 Some(payload) => {
                     new_payload.extend_from_slice(payload.as_ref());
                     offset_delta += payload.len() as u32;
-                },
-                None => {},
+                }
+                None => {}
             }
             current_offset += offset_delta;
         }
@@ -176,7 +178,6 @@ impl Merge for ImprintRecord {
 
 #[cfg(test)]
 mod tests {
-    use proptest::bits::BitSetLike;
     use super::*;
     use crate::ImprintWriter;
 
@@ -420,16 +421,16 @@ mod tests {
         assert_eq!(merged.get_value(3).unwrap(), Some("hello".into()));
         assert_eq!(merged.get_value(4).unwrap(), Some(123i64.into()));
         let mut start = 0;
-        let mut end = start + 42.len() / 8;
+        let mut end = start + 4;
         assert_eq!(&merged.payload.slice(start..end)[..], 42u32.to_le_bytes());
         start = end;
         end = start + 1;
         assert_eq!(&merged.payload.slice(start..end)[..], 1u8.to_le_bytes());
-        start = end + 1;  // + 1 is encoded length of the string
+        start = end + 1; // + 1 is encoded length of the string
         end = start + "hello".len();
         assert_eq!(&merged.payload.slice(start..end)[..], "hello".as_bytes());
         start = end;
-        end = start + 123i64.len() / 8;
+        end = start + 8;
         assert_eq!(&merged.payload.slice(start..end)[..], 123i64.to_le_bytes());
     }
 
@@ -448,14 +449,14 @@ mod tests {
         let mut start = 0;
         let mut end = 1;
         assert_eq!(&merged.payload.slice(start..end)[..], 1u8.to_le_bytes());
-        start = end + 1;  // + 1 is encoded length of the string
+        start = end + 1; // + 1 is encoded length of the string
         end = start + "first".len();
         assert_eq!(&merged.payload.slice(start..end)[..], "first".as_bytes());
-        start = end + 1;  // + 1 is encoded length of the string
+        start = end + 1; // + 1 is encoded length of the string
         end = start + "second".len();
         assert_eq!(&merged.payload.slice(start..end)[..], "second".as_bytes());
         start = end;
-        end = start + 42.len() / 8;
+        end = start + 4;
         assert_eq!(&merged.payload.slice(start..end)[..], 42u32.to_le_bytes());
     }
 
@@ -464,12 +465,14 @@ mod tests {
         let (record1, record2) = create_overlapping_records();
 
         // When merging with default options (keep zombie data)
-        let merged = record1.merge_with_opts(
-            &record2,
-            MergeOptions {
-                filter_duplicate_payloads: true,
-            },
-        ).unwrap();
+        let merged = record1
+            .merge_with_opts(
+                &record2,
+                MergeOptions {
+                    filter_duplicate_payloads: true,
+                },
+            )
+            .unwrap();
 
         // Then first occurrence of duplicate fields should be kept
         assert_eq!(merged.directory.len(), 3);
@@ -479,11 +482,11 @@ mod tests {
         let mut start = 0;
         let mut end = 1;
         assert_eq!(&merged.payload.slice(start..end)[..], 1u8.to_le_bytes());
-        start = end + 1;  // + 1 is encoded length of the string
+        start = end + 1; // + 1 is encoded length of the string
         end = start + "first".len();
         assert_eq!(&merged.payload.slice(start..end)[..], "first".as_bytes());
         start = end;
-        end = start + 42.len() / 8;
+        end = start + 4;
         assert_eq!(&merged.payload.slice(start..end)[..], 42u32.to_le_bytes());
     }
 
@@ -492,14 +495,16 @@ mod tests {
         let mut writer1 = ImprintWriter::new(SchemaId {
             fieldspace_id: 1,
             schema_hash: 0xdeadbeef,
-        }).unwrap();
+        })
+        .unwrap();
         writer1.add_field(2, "first".into()).unwrap();
         writer1.add_field(3, 42.into()).unwrap();
 
         let mut writer2 = ImprintWriter::new(SchemaId {
             fieldspace_id: 1,
             schema_hash: 0xcafebabe,
-        }).unwrap();
+        })
+        .unwrap();
         writer2.add_field(1, true.into()).unwrap();
         writer2.add_field(2, "second".into()).unwrap();
 
