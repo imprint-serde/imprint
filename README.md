@@ -183,9 +183,6 @@ records.
 
 ![Imprint v. Protobuf: Merging Records](.github/images/imprint-merge_bench.png)
 
-The source for the benchmarks are available in the `benches` directory of this
-repository.
-
 ### Projection (Field Subset)
 
 Projection can be done without deserializing any of the payload. After
