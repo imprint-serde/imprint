@@ -74,35 +74,15 @@ impl Project for ImprintRecord {
     }
 }
 
-#[derive(Debug, Clone, Copy, Default)]
-pub struct MergeOptions {
-    /// If true, duplicate fields from the second record will be filtered out of the payload
-    /// If false, they will remain in the payload but won't be accessible via the directory
-    pub filter_duplicate_payloads: bool,
-}
-
 pub trait Merge {
     /// Merge another record into this one, using default options.
     /// By default, duplicate fields from the second record will be kept in the payload
     /// but won't be accessible via the directory.
-    fn merge(&self, other: &ImprintRecord) -> Result<ImprintRecord, ImprintError> {
-        self.merge_with_opts(other, MergeOptions::default())
-    }
-
-    /// Merge another record into this one with specific options for handling duplicates.
-    fn merge_with_opts(
-        &self,
-        other: &ImprintRecord,
-        options: MergeOptions,
-    ) -> Result<ImprintRecord, ImprintError>;
+    fn merge(&self, other: &ImprintRecord) -> Result<ImprintRecord, ImprintError>;
 }
 
 impl Merge for ImprintRecord {
-    fn merge_with_opts(
-        &self,
-        other: &ImprintRecord,
-        options: MergeOptions,
-    ) -> Result<ImprintRecord, ImprintError> {
+    fn merge(&self, other: &ImprintRecord) -> Result<ImprintRecord, ImprintError> {
         // we just shrink the directory and payload to the exact size we need at the end of the
         // merge and allocate the largest possible sizes up front assuming that the records do
         // not have significant overlapping fields
@@ -117,7 +97,6 @@ impl Merge for ImprintRecord {
         while self_idx < self.directory.len() || other_idx < other.directory.len() {
             let current_entry;
             let current_payload;
-            let mut duplicate_payload = None;
             if self_idx < self.directory.len()
                 && (other_idx >= other.directory.len()
                     || self.directory[self_idx].id <= other.directory[other_idx].id)
@@ -126,10 +105,6 @@ impl Merge for ImprintRecord {
                 if other_idx < other.directory.len()
                     && self.directory[self_idx].id == other.directory[other_idx].id
                 {
-                    if !options.filter_duplicate_payloads {
-                        duplicate_payload =
-                            Some(other.get_raw_bytes(other.directory[other_idx].id).unwrap());
-                    }
                     other_idx += 1;
                 }
                 current_payload = self.get_raw_bytes(current_entry.id).unwrap();
@@ -149,15 +124,8 @@ impl Merge for ImprintRecord {
             new_directory.push(new_entry);
 
             // Copy corresponding payload
-            let mut offset_delta = current_payload.len() as u32;
+            let offset_delta = current_payload.len() as u32;
             new_payload.extend_from_slice(current_payload.as_ref());
-            match duplicate_payload {
-                Some(payload) => {
-                    new_payload.extend_from_slice(payload.as_ref());
-                    offset_delta += payload.len() as u32;
-                }
-                None => {}
-            }
             current_offset += offset_delta;
         }
 
@@ -435,44 +403,10 @@ mod tests {
     }
 
     #[test]
-    fn should_merge_records_with_overlapping_fields_keeping_all_payloads() {
+    fn should_merge_records_with_overlapping_fields() {
         let (record1, record2) = create_overlapping_records();
 
-        // When merging with default options (keep zombie data)
         let merged = record1.merge(&record2).unwrap();
-
-        // Then first occurrence of duplicate fields should be kept
-        assert_eq!(merged.directory.len(), 3);
-        assert_eq!(merged.get_value(1).unwrap(), Some(true.into()));
-        assert_eq!(merged.get_value(2).unwrap(), Some("first".into()));
-        assert_eq!(merged.get_value(3).unwrap(), Some(42.into()));
-        let mut start = 0;
-        let mut end = 1;
-        assert_eq!(&merged.payload.slice(start..end)[..], 1u8.to_le_bytes());
-        start = end + 1; // + 1 is encoded length of the string
-        end = start + "first".len();
-        assert_eq!(&merged.payload.slice(start..end)[..], "first".as_bytes());
-        start = end + 1; // + 1 is encoded length of the string
-        end = start + "second".len();
-        assert_eq!(&merged.payload.slice(start..end)[..], "second".as_bytes());
-        start = end;
-        end = start + 4;
-        assert_eq!(&merged.payload.slice(start..end)[..], 42u32.to_le_bytes());
-    }
-
-    #[test]
-    fn should_merge_records_with_overlapping_fields_filtering_overlapping_payloads() {
-        let (record1, record2) = create_overlapping_records();
-
-        // When merging with default options (keep zombie data)
-        let merged = record1
-            .merge_with_opts(
-                &record2,
-                MergeOptions {
-                    filter_duplicate_payloads: true,
-                },
-            )
-            .unwrap();
 
         // Then first occurrence of duplicate fields should be kept
         assert_eq!(merged.directory.len(), 3);
