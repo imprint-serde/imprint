@@ -39,8 +39,8 @@ cat <<EOF > "$REPORT_FILE"
 
 This pull request includes Criterion benchmarks comparing performance to the \`main\` branch.
 
-The table below shows **relative ratios** and **timing stats**, and **throughput estimates** for each benchmark group. 
-A ratio above \`1.00\` means this PR is **slower**, while below \`1.00\` means it is **faster**.
+The table below shows **relative ratios** and **timing stats** for each benchmark group. 
+A ratio above \`1.00\` means this PR is **slower**.
 
 \`\`\`
 $(critcmp main pr)
@@ -49,9 +49,10 @@ $(critcmp main pr)
 ✅ Benchmarks completed successfully.
 
 🧠 **Notes**:
-- These benchmarks are not a pass/fail gate.
+- These benchmarks are not a pass/fail gate and are informative only.
 - Use this as a signal to review performance-sensitive changes.
-- Results may vary significantly due to GHA runner hardware variance.
+- Results may be unreliable due to GHA runner hardware variance.
+- If results indicate a significant performance regression, run the benchmarks locally to confirm.
 
 _Reported by the benchmark CI bot_
 EOF

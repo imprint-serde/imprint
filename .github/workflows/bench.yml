@@ -48,8 +48,7 @@ jobs:
 
             // Look for a comment containing our marker
             const existing = comments.find(comment =>
-              comment.body.includes(marker) &&
-              comment.user.login === context.actor // Ensure it's ours
+              comment.body.includes(marker)
             );
 
             if (existing) {
