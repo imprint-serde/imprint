@@ -60,7 +60,7 @@ jobs:
                 comment_id: existing.id,
                 body,
               });
-              console.log('✅ Updated existing benchmark comment');
+              console.log('Updated existing benchmark comment');
             } else {
               // Create a new comment
               await github.rest.issues.createComment({
@@ -69,5 +69,5 @@ jobs:
                 repo: context.repo.repo,
                 body,
               });
-              console.log('🆕 Created new benchmark comment');
+              console.log('Created new benchmark comment');
             }

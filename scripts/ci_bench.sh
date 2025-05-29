@@ -13,12 +13,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Check if critcmp is installed
-if ! command -v critcmp >/dev/null 2>&1; then
-  echo "❌ critcmp is not installed. Please run: cargo install critcmp"
-  exit 1
-fi
-
 # Fetch and prepare main branch in a clean worktree
 echo "📦 Checking out 'main' into temporary worktree..."
 git fetch origin main
@@ -39,6 +33,27 @@ cargo bench --bench "$BENCH_NAME" -- --save-baseline pr
 
 # Compare with critcmp
 echo "📊 Comparing benchmarks..."
-critcmp main pr | ./scripts/format_critcmp.sh > "$REPORT_FILE"
+
+cat <<EOF > "$REPORT_FILE"
+## 📊 Benchmark Comparison Report
+
+This pull request includes Criterion benchmarks comparing performance to the \`main\` branch.
+
+The table below shows **relative ratios** and **timing stats**, and **throughput estimates** for each benchmark group. 
+A ratio above \`1.00\` means this PR is **slower**, while below \`1.00\` means it is **faster**.
+
+\`\`\`
+$(critcmp main pr)
+\`\`\`
+
+✅ Benchmarks completed successfully.
+
+🧠 **Notes**:
+- These benchmarks are not a pass/fail gate.
+- Use this as a signal to review performance-sensitive changes.
+- Results may vary significantly due to GHA runner hardware variance.
+
+_Reported by the benchmark CI bot_
+EOF
 
 echo "✅ Benchmark comparison saved to $REPORT_FILE"
