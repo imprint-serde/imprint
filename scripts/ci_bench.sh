@@ -38,9 +38,9 @@ cat <<EOF > "$REPORT_FILE"
 ## 📊 Benchmark Comparison Report
 
 This pull request includes Criterion benchmarks comparing performance to the \`main\` branch.
+This comment will automatically update as the benchmarks are re-run on each commit.
 
-The table below shows **relative ratios** and **timing stats** for each benchmark group. 
-A ratio above \`1.00\` means this PR is **slower**.
+The table below shows **relative ratios** and **timing stats** for each benchmark group:
 
 \`\`\`
 $(critcmp main pr)
