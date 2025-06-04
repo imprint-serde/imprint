@@ -93,8 +93,7 @@ record:
 
 | Bit | Name                   | Meaning                              |
 |-----|------------------------|--------------------------------------|
-| 0   | `FLAG_FIELD_DIRECTORY` | Whether a field directory is present |
-| 1-7 | _reserved_             | Must be `0` in v1                    |
+| 0-7 | _reserved_             | Must be `0` in v1                    |
 
 Schemas in Imprint have two components: 
 

@@ -43,7 +43,7 @@ impl ImprintWriter {
         }
 
         let header = Header {
-            flags: Flags::new(Flags::FIELD_DIRECTORY),
+            flags: Flags::new(0),
             schema_id: self.schema_id,
             payload_size: payload.len() as u32,
         };

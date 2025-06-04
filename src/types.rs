@@ -10,19 +10,14 @@ pub const MAGIC: u8 = 0x49;
 pub const VERSION: u8 = 0x01;
 
 /// Flags that control how to deserialize the record
+/// There are currently no flags but this is reserved
+/// for future use.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Flags(pub(crate) u8);
 
 impl Flags {
-    /// Whether a field directory is present in the record
-    pub const FIELD_DIRECTORY: u8 = 0x01;
-
     pub fn new(flags: u8) -> Self {
         Self(flags)
-    }
-
-    pub fn has_field_directory(&self) -> bool {
-        self.0 & Self::FIELD_DIRECTORY != 0
     }
 }
 
