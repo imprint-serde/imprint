@@ -428,22 +428,16 @@ impl Write for ImprintRecord {
         let header_size = HEADER_BYTES;
         let dir_count_size = DIR_COUNT_BYTES;
 
-        let dir_entries_size = if self.header.flags.has_field_directory() {
-            self.directory.len() * DIR_ENTRY_BYTES
-        } else {
-            0
-        };
+        let dir_entries_size = self.directory.len() * DIR_ENTRY_BYTES;
 
         let payload_size = self.payload.len();
         buf.reserve(header_size + dir_count_size + dir_entries_size + payload_size);
 
         self.header.write(buf)?;
 
-        if self.header.flags.has_field_directory() {
-            varint::encode(self.directory.len() as u32, buf);
-            for entry in &self.directory {
-                entry.write(buf)?;
-            }
+        varint::encode(self.directory.len() as u32, buf);
+        for entry in &self.directory {
+            entry.write(buf)?;
         }
 
         buf.put_slice(&self.payload);
@@ -461,17 +455,15 @@ impl Read for ImprintRecord {
         bytes_read += header_size;
 
         let mut directory = Vec::new();
-        if header.flags.has_field_directory() {
-            let (count, count_size) = varint::decode(bytes.clone())?;
-            bytes.advance(count_size);
-            bytes_read += count_size;
+        let (count, count_size) = varint::decode(bytes.clone())?;
+        bytes.advance(count_size);
+        bytes_read += count_size;
 
-            for _ in 0..count {
-                let (entry, entry_size) = DirectoryEntry::read(bytes.clone())?;
-                bytes.advance(entry_size);
-                bytes_read += entry_size;
-                directory.push(entry);
-            }
+        for _ in 0..count {
+            let (entry, entry_size) = DirectoryEntry::read(bytes.clone())?;
+            bytes.advance(entry_size);
+            bytes_read += entry_size;
+            directory.push(entry);
         }
 
         let payload = bytes.slice(..header.payload_size as usize);
@@ -627,7 +619,7 @@ mod tests {
         // Then the outer record metadata should be preserved
         assert_eq!(deserialized_record.header.schema_id.fieldspace_id, 1);
         assert_eq!(deserialized_record.header.schema_id.schema_hash, 0xdeadbeef);
-        assert_eq!(deserialized_record.header.flags.0, Flags::FIELD_DIRECTORY);
+        assert_eq!(deserialized_record.header.flags, Flags::new(0));
         assert_eq!(deserialized_record.directory.len(), 2);
 
         // And the outer record values should match
@@ -639,7 +631,7 @@ mod tests {
         if let Value::Row(inner) = got_row {
             assert_eq!(inner.header.schema_id.fieldspace_id, 2);
             assert_eq!(inner.header.schema_id.schema_hash, 0xcafebabe);
-            assert_eq!(inner.header.flags.0, Flags::FIELD_DIRECTORY);
+            assert_eq!(inner.header.flags, Flags::new(0));
             assert_eq!(inner.directory.len(), 2);
 
             let got_inner_int = inner.get_value(1).unwrap().unwrap();
@@ -690,7 +682,7 @@ mod tests {
             // Verify metadata
             prop_assert_eq!(record.header.schema_id.fieldspace_id, 1);
             prop_assert_eq!(record.header.schema_id.schema_hash, 0xdeadbeef);
-            prop_assert_eq!(record.header.flags.0, Flags::FIELD_DIRECTORY);
+            prop_assert_eq!(record.header.flags, Flags::new(0));
             prop_assert_eq!(record.directory.len(), 8);
 
             // Verify all values are preserved
