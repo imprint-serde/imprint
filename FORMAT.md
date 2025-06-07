@@ -37,7 +37,7 @@ Each directory entry (7 bytes):
 ```text
      +----------------+-------+----------------+
      | Field ID       | Type  | Field Offset   |
-     | (LE u32)       | Code  | (LE u32)       |
+     | (LE u16)       | Code  | (LE u32)       |
      +----------------+-------+----------------+
       Bytes 0-1        Byte 2  Bytes 3-6
 ```
