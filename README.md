@@ -1,6 +1,6 @@
 # Imprint: Serialization Format for Data Pipelines
 
-<img src=".github/images/imprint-logo.png" alt="Imprint Logo" style="width: 60%; margin: auto;"/>
+<img src=".github/images/imprint-banner.png" alt="Imprint Logo" style="width: 100%; margin: auto;"/>
 
 Imprint is a binary row serialization format built for stream processing
 workloads, particularly those involving **incremental joins** and
