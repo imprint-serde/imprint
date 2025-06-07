@@ -5,10 +5,10 @@ use crate::{
 use bytes::BytesMut;
 
 pub trait Project {
-    fn project(&self, field_ids: &[u32]) -> Result<ImprintRecord, ImprintError>;
+    fn project(&self, field_ids: &[u16]) -> Result<ImprintRecord, ImprintError>;
 }
 impl Project for ImprintRecord {
-    fn project(&self, field_ids: &[u32]) -> Result<ImprintRecord, ImprintError> {
+    fn project(&self, field_ids: &[u16]) -> Result<ImprintRecord, ImprintError> {
         // Sort and deduplicate the field IDs for efficient matching with sorted directory
         let mut sorted_field_ids = field_ids.to_vec();
         sorted_field_ids.sort_unstable();
@@ -198,7 +198,7 @@ mod tests {
         assert_eq!(projected.get_value(7).unwrap(), Some(vec![1, 2, 3].into()));
 
         // And directory should maintain sorted order
-        let dir_ids: Vec<u32> = projected.directory.iter().map(|e| e.id).collect();
+        let dir_ids: Vec<u16> = projected.directory.iter().map(|e| e.id).collect();
         assert!(
             dir_ids.windows(2).all(|w| w[0] < w[1]),
             "directory entries should be sorted by field id"
@@ -222,7 +222,7 @@ mod tests {
     fn should_preserve_all_fields_when_projecting_all() {
         // Given a record with multiple fields
         let record = create_test_record();
-        let all_fields: Vec<u32> = record.directory.iter().map(|e| e.id).collect();
+        let all_fields: Vec<u16> = record.directory.iter().map(|e| e.id).collect();
 
         // When projecting all fields
         let projected = record.project(&all_fields).unwrap();
