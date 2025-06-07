@@ -128,7 +128,7 @@ Each entry has the following format:
 
 | Field    | Encoding | Description                                        |
 |----------|----------|----------------------------------------------------|
-| `id`     | `u32`    | Uniquely assigned identifier within a fieldspace   |
+| `id`     | `u16`    | Uniquely assigned identifier within a fieldspace   |
 | `type`   | `u8`     | Field type identifier, see below                   | 
 | `offset` | `u32`    | Byte position of the value relative to the payload |
 

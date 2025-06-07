@@ -11,7 +11,7 @@ use crate::{
 
 const HEADER_BYTES: usize = 15;
 const DIR_COUNT_BYTES: usize = 5;
-const DIR_ENTRY_BYTES: usize = 9;
+const DIR_ENTRY_BYTES: usize = 7;
 
 /// A trait for types that can be written to a byte buffer
 pub trait Write {
@@ -315,7 +315,7 @@ impl ValueRead for MapKey {
 
 impl Write for DirectoryEntry {
     fn write(&self, buf: &mut BytesMut) -> Result<(), ImprintError> {
-        buf.put_u32_le(self.id);
+        buf.put_u16_le(self.id);
         buf.put_u8(self.type_code as u8);
         buf.put_u32_le(self.offset);
         Ok(())
@@ -324,14 +324,14 @@ impl Write for DirectoryEntry {
 
 impl Read for DirectoryEntry {
     fn read(mut bytes: Bytes) -> Result<(Self, usize), ImprintError> {
-        if bytes.remaining() < 9 {
+        if bytes.remaining() < DIR_ENTRY_BYTES {
             return Err(ImprintError::BufferUnderflow {
-                needed: 9,
+                needed: DIR_ENTRY_BYTES,
                 available: bytes.remaining(),
             });
         }
 
-        let id = bytes.get_u32_le();
+        let id = bytes.get_u16_le();
         let type_code = TypeCode::try_from(bytes.get_u8())?;
         let offset = bytes.get_u32_le();
 
@@ -341,7 +341,7 @@ impl Read for DirectoryEntry {
                 type_code,
                 offset,
             },
-            9,
+            DIR_ENTRY_BYTES,
         ))
     }
 }

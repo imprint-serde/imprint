@@ -283,11 +283,11 @@ impl PartialEq<Value> for MapKey {
 }
 
 /// A directory entry describing a single field in an Imprint record.
-/// Each entry has a fixed size of 9 bytes.
+/// Each entry has a fixed size of 7 bytes.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DirectoryEntry {
-    /// Uniquely assigned identifier within a fieldspace (4 bytes)
-    pub id: u32,
+    /// Uniquely assigned identifier within a fieldspace (2 bytes)
+    pub id: u16,
     /// Field type identifier (1 byte)
     pub type_code: TypeCode,
     /// Byte position of the value relative to the payload (4 bytes)
@@ -319,7 +319,7 @@ pub struct ImprintRecord {
 
 impl ImprintRecord {
     /// Get a value by field ID, deserializing it on demand
-    pub fn get_value(&self, field_id: u32) -> Result<Option<Value>, ImprintError> {
+    pub fn get_value(&self, field_id: u16) -> Result<Option<Value>, ImprintError> {
         match self.directory.binary_search_by_key(&field_id, |e| e.id) {
             Ok(idx) => {
                 let entry = &self.directory[idx];
@@ -332,7 +332,7 @@ impl ImprintRecord {
     }
 
     /// Get the raw bytes for a field without deserializing
-    pub fn get_raw_bytes(&self, field_id: u32) -> Option<Bytes> {
+    pub fn get_raw_bytes(&self, field_id: u16) -> Option<Bytes> {
         let idx = self
             .directory
             .binary_search_by_key(&field_id, |e| e.id)

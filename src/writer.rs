@@ -10,7 +10,7 @@ use crate::{
 /// A writer for constructing ImprintRecords by adding fields sequentially.
 pub struct ImprintWriter {
     schema_id: SchemaId,
-    fields: BTreeMap<u32, Value>, // keep fields in sorted order
+    fields: BTreeMap<u16, Value>, // keep fields in sorted order
 }
 
 impl ImprintWriter {
@@ -23,7 +23,7 @@ impl ImprintWriter {
     }
 
     /// Adds a field to the record being built.
-    pub fn add_field(&mut self, id: u32, value: Value) -> Result<(), ImprintError> {
+    pub fn add_field(&mut self, id: u16, value: Value) -> Result<(), ImprintError> {
         self.fields.insert(id, value);
         Ok(())
     }
@@ -43,7 +43,7 @@ impl ImprintWriter {
         }
 
         let header = Header {
-            flags: Flags::new(0),
+            flags: Flags::new(0), // Set appropriate flags as needed
             schema_id: self.schema_id,
             payload_size: payload.len() as u32,
         };

@@ -28,18 +28,18 @@ Flags:
 ```text
      +---------------------+---------------------+---------------------+
      | Count (varint)      | Entry 1             | Entry 2             | ...
-     | (1-5 bytes)         | (9 bytes)           | (9 bytes)           |
+     | (1-5 bytes)         | (7 bytes)           | (7 bytes)           |
      +---------------------+---------------------+---------------------+
 ```
 
-Each directory entry (9 bytes):
+Each directory entry (7 bytes):
 
 ```text
      +----------------+-------+----------------+
      | Field ID       | Type  | Field Offset   |
-     | (LE u32)       | Code  | (LE u32)       |
+     | (LE u16)       | Code  | (LE u32)       |
      +----------------+-------+----------------+
-      Bytes 0-3        Byte 4  Bytes 5-8
+      Bytes 0-1        Byte 2  Bytes 3-6
 ```
 
 ## Type Codes
@@ -210,7 +210,7 @@ Also see [LEB128 encoding](https://en.wikipedia.org/wiki/LEB128) for more detail
 |                                                                           |
 | FIELD DIRECTORY (present because Flag 0x01 is set):                       |
 | +-----------------+----------------------------------------+              |
-| | Count (varint)  | Directory Entries (Count × 9 bytes)    |              |
+| | Count (varint)  | Directory Entries (Count × 7 bytes)    |              |
 | +-----------------+----------------------------------------+              |
 |                                                                           |
 | PAYLOAD (contains encoded field values):                                  |
