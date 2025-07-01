@@ -132,7 +132,6 @@ Each entry has the following format:
 | `type`   | `u8`     | Field type identifier, see below                   | 
 | `offset` | `u32`    | Byte position of the value relative to the payload |
 
-
 ## Payload Encoding
 
 | `type_code` | Type       | Encoding details                                       |
