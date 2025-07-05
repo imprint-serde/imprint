@@ -136,8 +136,8 @@ Each entry has the following format:
 
 | `type_code` | Type       | Encoding details                                       |
 | ----------: | ---------- | ------------------------------------------------------ |
-|         0x0 | `null`     | No payload; `length` = 0                               |
-|         0x1 | `bool`     | 1 byte `0x00` / `0x01`                                 |
+|         0x0 | `null`     | No payload; `length` = 0                               |
+|         0x1 | `bool`     | 1 byte `0x00` / `0x01`                                 |
 |         0x2 | `int32`    | 4-byte signed int32                                    |
 |         0x3 | `int64`    | 8-byte signed int64                                    |
 |         0x4 | `float32`  | IEEE‑754 little‑endian bytes                           |
@@ -147,7 +147,14 @@ Each entry has the following format:
 |         0x8 | `array`    | `size` + `type_code` + payload                         |
 |         0x9 | `map`      | `size` + `key_type_code` + `value_type_code` + payload |
 |         0xA | `row`      | Nested Imprint row (recursive joins)                   |
-|      10–127 | *reserved* | Future primitives / logical types                      |
+|         0xB | `date`     | 4-byte int32 days since Unix epoch                     |
+|         0xC | `time`     | 4-byte int32 milliseconds since midnight               |
+|         0xD | `timestamp`| 4-byte int32 milliseconds since Unix epoch (UTC)       |
+|         0xE | `uuid`     | 16-byte binary representation                          |
+|         0xF | `decimal`  | `varint scale` + `varint length` + `unscaled bytes`    |
+|      16–127 | *reserved* | Future primitives / logical types                      |
+
+
 
 ## Algorithms for Various Data Operations
 
