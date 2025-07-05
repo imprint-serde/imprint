@@ -148,11 +148,12 @@ Each entry has the following format:
 |         0x9 | `map`      | `size` + `key_type_code` + `value_type_code` + payload |
 |         0xA | `row`      | Nested Imprint row (recursive joins)                   |
 |         0xB | `date`     | 4-byte int32 days since Unix epoch                     |
-|         0xC | `time`     | 8-byte int64 milliseconds since midnight               |
-|         0xD | `uuid`     | 16-byte binary representation                          |
-|         0xE | `decimal`  | varint scale + varint length + unscaled bytes          |
-|         0xF | `timestamp`| 8-byte int64 milliseconds since Unix epoch (UTC)      |
+|         0xC | `time`     | 4-byte int32 milliseconds since midnight               |
+|         0xD | `timestamp`| 4-byte int32 milliseconds since Unix epoch (UTC)       |
+|         0xE | `uuid`     | 16-byte binary representation                          |
+|         0xF | `decimal`  | `varint scale` + `varint length` + `unscaled bytes`    |
 |      16–127 | *reserved* | Future primitives / logical types                      |
+
 
 
 ## Algorithms for Various Data Operations
